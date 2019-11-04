@@ -77,6 +77,8 @@ function addSymbol(evt) {
       text = ' ';
     } else if (key.classList.contains('Enter')) {
       text = '\n';
+    } else if (key.classList.contains('Backspace') || key.classList.contains('Delete')) {
+      textarea.value = textarea.value.slice(0, textarea.value.length - 1);
     }
   }
 
