@@ -106,7 +106,7 @@ window.helper.WRITINGKEYCODES = {
   KeyR: { en: ['r', 'R'], ru: ['к', 'К'] },
   KeyT: { en: ['t', 'T'], ru: ['е', 'Е'] },
   KeyY: { en: ['y', 'Y'], ru: ['н', 'Н'] },
-  KeyU: { en: ['u', 'U'], ru: ['Г', 'Г'] },
+  KeyU: { en: ['u', 'U'], ru: ['г', 'Г'] },
   KeyI: { en: ['i', 'I'], ru: ['ш', 'Ш'] },
   KeyO: { en: ['o', 'O'], ru: ['щ', 'Щ'] },
   KeyP: { en: ['p', 'P'], ru: ['з', 'З'] },
