@@ -10,7 +10,7 @@ const keyboard = document.createElement('div');
 keyboard.classList.add('keyboard');
 wrap.appendChild(keyboard);
 
-let lang = 'en';
+let lang = localStorage.getItem('lang') || 'en';
 let shift = false;
 
 function renderWritingKeys() {
@@ -39,6 +39,9 @@ function renderWritingKeys() {
 }
 
 function animationOn(evt) {
+  if (evt.key === 'Alt' || evt.key === 'Meta' || evt.key === 'Tab') {
+    evt.preventDefault();
+  }
   const key =
     document.querySelector(`.${evt.code}`) ||
     document.querySelector(`.${evt.target.classList[1]}`) ||
@@ -53,7 +56,10 @@ function animationOff(evt) {
     document.querySelector(`.${evt.target.classList[1]}`) ||
     document.querySelector(`.${evt.target.parentNode.classList[1]}`);
   key.style.borderRadius = '3px';
-  key.style.background = '#3a424e';
+
+  if (key.classList.contains('functional')) {
+    key.style.background = '#1c232e';
+  } else key.style.background = '#3a424e';
 }
 
 function addSymbol(evt) {
@@ -61,13 +67,61 @@ function addSymbol(evt) {
     document.querySelector(`.${evt.code}`) ||
     document.querySelector(`.${evt.target.classList[1]}`) ||
     document.querySelector(`.${evt.target.parentNode.classList[1]}`);
-  let text;
-  if (!key.classList.contains('functional') && evt.target !== textarea) {
-    text = key.lastElementChild.innerText;
-    textarea.value += text;
-  } else if (key.classList.contains('Space') && evt.target !== textarea) {
-    text = ' ';
-    textarea.value += text;
+  let text = '';
+
+  textarea.focus();
+  if (evt.target !== textarea) {
+    if (!key.classList.contains('functional')) {
+      text = key.lastElementChild.innerText;
+    } else if (key.classList.contains('Space')) {
+      text = ' ';
+    } else if (key.classList.contains('Enter')) {
+      text = '\n';
+    }
+  }
+
+  textarea.value += text;
+}
+
+function onMousedown(evt) {
+  if (evt.target.classList.contains('key') || evt.target.parentNode.classList.contains('key')) {
+    if (evt.target.classList.contains('CapsLock') || evt.target.parentNode.classList.contains('CapsLock')) {
+      shift = !shift;
+      renderWritingKeys();
+    }
+
+    if (
+      evt.target.classList.contains('ShiftLeft') ||
+      evt.target.parentNode.classList.contains('ShiftLeft') ||
+      evt.target.classList.contains('ShiftRight') ||
+      evt.target.parentNode.classList.contains('ShiftRight')
+    ) {
+      shift = !shift;
+      renderWritingKeys();
+      evt.preventDefault();
+    }
+
+    animationOn(evt);
+    let binded;
+
+    const onMouseup = function onMouseup(e) {
+      animationOff(e);
+      addSymbol(e);
+
+      if (
+        evt.target.classList.contains('ShiftLeft') ||
+        evt.target.parentNode.classList.contains('ShiftLeft') ||
+        evt.target.classList.contains('ShiftRight') ||
+        evt.target.parentNode.classList.contains('ShiftRight')
+      ) {
+        shift = !shift;
+        renderWritingKeys();
+      }
+
+      document.removeEventListener('mouseup', binded);
+    };
+    binded = onMouseup.bind(null, evt);
+    document.addEventListener('mouseup', binded);
   }
 }
 
@@ -114,20 +168,8 @@ document.addEventListener('keyup', evt => {
   }
 });
 
-function onMousedown(evt) {
-  if (evt.target.classList.contains('key') || evt.target.parentNode.classList.contains('key')) {
-    animationOn(evt);
-    let binded;
-
-    const onMouseup = function onMouseup(e) {
-      animationOff(e);
-      addSymbol(e);
-
-      document.removeEventListener('mouseup', binded);
-    };
-    binded = onMouseup.bind(null, evt);
-    document.addEventListener('mouseup', binded);
-  }
-}
-
 keyboard.addEventListener('mousedown', onMousedown);
+
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('lang', lang);
+});
