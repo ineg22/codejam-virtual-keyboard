@@ -1,6 +1,11 @@
+import helper from './helper.js';
+
+const { KEYCODES, FUNCTIONALKEYCODES, WRITINGKEYCODES } = helper;
+const fragment = document.createDocumentFragment();
+
 const wrap = document.createElement('div');
 wrap.classList.add('wrapper');
-document.querySelector('body').appendChild(wrap);
+document.body.appendChild(wrap);
 
 const textarea = document.createElement('textarea');
 textarea.classList.add('textarea');
@@ -14,27 +19,45 @@ let lang = localStorage.getItem('lang') || 'en';
 let shift = false;
 
 function renderWritingKeys() {
-  const writingKeys = Object.keys(window.helper.WRITINGKEYCODES);
+  const writingKeys = Object.keys(WRITINGKEYCODES);
 
   for (let i = 0; i < writingKeys.length; i += 1) {
-    let inner;
-    const currentKey = window.helper.WRITINGKEYCODES[writingKeys[i]][lang];
+    const currentKey = WRITINGKEYCODES[writingKeys[i]][lang];
+    const [firstChar, secondChar] = currentKey;
 
     if (shift) {
-      if (currentKey[0].toUpperCase() === currentKey[1]) {
-        inner = `<span>${currentKey[1]}</span>`;
+      if (firstChar.toUpperCase() === secondChar) {
+        const span = document.createElement('span');
+        span.textContent = secondChar;
+        fragment.appendChild(span);
       } else {
-        inner = `<sup>${currentKey[0]}</sup><span>${currentKey[1]}</span>`;
+        const sup = document.createElement('sup');
+        sup.textContent = firstChar;
+        const span = document.createElement('span');
+        span.textContent = secondChar;
+        fragment.appendChild(sup);
+        fragment.appendChild(span);
       }
     }
     if (!shift) {
-      if (currentKey[0].toUpperCase() === currentKey[1]) {
-        inner = `<span>${currentKey[0]}</span>`;
+      if (firstChar.toUpperCase() === secondChar) {
+        const span = document.createElement('span');
+        span.textContent = firstChar;
+        fragment.appendChild(span);
       } else {
-        inner = `<sup>${currentKey[1]}</sup><span>${currentKey[0]}</span>`;
+        const sup = document.createElement('sup');
+        sup.textContent = secondChar;
+        const span = document.createElement('span');
+        span.textContent = firstChar;
+        fragment.appendChild(sup);
+        fragment.appendChild(span);
       }
     }
-    document.querySelector(`.${writingKeys[i]}`).innerHTML = inner;
+    const currNode = document.querySelector(`.${writingKeys[i]}`);
+    while (currNode.hasChildNodes()) {
+      currNode.removeChild(currNode.firstChild);
+    }
+    currNode.appendChild(fragment);
   }
 }
 
@@ -46,8 +69,7 @@ function animationOn(evt) {
     document.querySelector(`.${evt.code}`) ||
     document.querySelector(`.${evt.target.classList[1]}`) ||
     document.querySelector(`.${evt.target.parentNode.classList[1]}`);
-  key.style.borderRadius = '15px';
-  key.style.background = 'darkslateblue';
+  key.classList.add('anime');
 }
 
 function animationOff(evt) {
@@ -55,11 +77,7 @@ function animationOff(evt) {
     document.querySelector(`.${evt.code}`) ||
     document.querySelector(`.${evt.target.classList[1]}`) ||
     document.querySelector(`.${evt.target.parentNode.classList[1]}`);
-  key.style.borderRadius = '3px';
-
-  if (key.classList.contains('functional')) {
-    key.style.background = '#1c232e';
-  } else key.style.background = '#3a424e';
+  key.classList.remove('anime');
 }
 
 function addSymbol(evt) {
@@ -68,11 +86,12 @@ function addSymbol(evt) {
     document.querySelector(`.${evt.target.classList[1]}`) ||
     document.querySelector(`.${evt.target.parentNode.classList[1]}`);
   let text = '';
-
   textarea.focus();
   if (evt.target !== textarea) {
     if (!key.classList.contains('functional')) {
-      text = key.lastElementChild.innerText;
+      const currKey = WRITINGKEYCODES[key.classList[1]][lang];
+      const [small, big] = currKey;
+      text = shift ? big : small;
     } else if (key.classList.contains('Space')) {
       text = ' ';
     } else if (key.classList.contains('Enter')) {
@@ -86,17 +105,18 @@ function addSymbol(evt) {
 }
 
 function onMousedown(evt) {
-  if (evt.target.classList.contains('key') || evt.target.parentNode.classList.contains('key')) {
-    if (evt.target.classList.contains('CapsLock') || evt.target.parentNode.classList.contains('CapsLock')) {
+  const { target } = evt;
+  if (target.classList.contains('key') || target.parentNode.classList.contains('key')) {
+    if (target.classList.contains('CapsLock') || target.parentNode.classList.contains('CapsLock')) {
       shift = !shift;
       renderWritingKeys();
     }
 
     if (
-      evt.target.classList.contains('ShiftLeft') ||
-      evt.target.parentNode.classList.contains('ShiftLeft') ||
-      evt.target.classList.contains('ShiftRight') ||
-      evt.target.parentNode.classList.contains('ShiftRight')
+      target.classList.contains('ShiftLeft') ||
+      target.parentNode.classList.contains('ShiftLeft') ||
+      target.classList.contains('ShiftRight') ||
+      target.parentNode.classList.contains('ShiftRight')
     ) {
       shift = !shift;
       renderWritingKeys();
@@ -111,10 +131,10 @@ function onMousedown(evt) {
       addSymbol(e);
 
       if (
-        evt.target.classList.contains('ShiftLeft') ||
-        evt.target.parentNode.classList.contains('ShiftLeft') ||
-        evt.target.classList.contains('ShiftRight') ||
-        evt.target.parentNode.classList.contains('ShiftRight')
+        target.classList.contains('ShiftLeft') ||
+        target.parentNode.classList.contains('ShiftLeft') ||
+        target.classList.contains('ShiftRight') ||
+        target.parentNode.classList.contains('ShiftRight')
       ) {
         shift = !shift;
         renderWritingKeys();
@@ -127,13 +147,14 @@ function onMousedown(evt) {
   }
 }
 
-const fragment = document.createDocumentFragment();
-for (let i = 0; i < window.helper.KEYCODES.length; i += 1) {
+for (let i = 0; i < KEYCODES.length; i += 1) {
   const key = document.createElement('div');
   key.classList.add('key');
-  key.classList.add(window.helper.KEYCODES[i]);
-  if (window.helper.FUNCTIONALKEYCODES[window.helper.KEYCODES[i]]) {
-    key.innerHTML = `<span>${window.helper.FUNCTIONALKEYCODES[window.helper.KEYCODES[i]]}</span>`;
+  key.classList.add(KEYCODES[i]);
+  if (FUNCTIONALKEYCODES[KEYCODES[i]]) {
+    const span = document.createElement('span');
+    span.textContent = FUNCTIONALKEYCODES[KEYCODES[i]];
+    key.appendChild(span);
     key.classList.add('functional');
   }
   fragment.appendChild(key);
@@ -143,7 +164,7 @@ renderWritingKeys();
 
 document.addEventListener('keydown', e => {
   const evt = e;
-  evt.target = textarea;
+  textarea.focus();
   addSymbol(evt);
   animationOn(evt);
   if (evt.key === 'Shift' && !evt.repeat) {

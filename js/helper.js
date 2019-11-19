@@ -1,5 +1,5 @@
-window.helper = {};
-window.helper.KEYCODES = [
+const helper = {};
+helper.KEYCODES = [
   'Backquote',
   'Digit1',
   'Digit2',
@@ -66,7 +66,7 @@ window.helper.KEYCODES = [
   'ControlRight',
 ];
 
-window.helper.FUNCTIONALKEYCODES = {
+helper.FUNCTIONALKEYCODES = {
   Backspace: 'Backspace',
   Tab: 'Tab',
   Delete: 'Del',
@@ -86,7 +86,7 @@ window.helper.FUNCTIONALKEYCODES = {
   ControlRight: 'Ctrl',
 };
 
-window.helper.WRITINGKEYCODES = {
+helper.WRITINGKEYCODES = {
   Backquote: { en: ['`', '~'], ru: ['ё', 'Ё'] },
   Digit1: { en: ['1', '!'], ru: ['1', '!'] },
   Digit2: { en: ['2', '@'], ru: ['2', '"'] },
@@ -135,3 +135,5 @@ window.helper.WRITINGKEYCODES = {
   Period: { en: ['.', '>'], ru: ['ю', 'Ю'] },
   Slash: { en: ['/', '?'], ru: ['.', ','] },
 };
+
+export default helper;
