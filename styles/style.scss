@@ -1,0 +1,93 @@
+* {
+  box-sizing: border-box;
+}
+
+.wrapper {
+  width: 704px;
+  margin: 0 auto;
+}
+
+.textarea {
+  width: 100%;
+  height: 100px;
+  margin: 20px 0;
+}
+
+.keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+
+  .Tab {
+    width: 50px;
+  }
+
+  .Delete {
+    width: 44px;
+  }
+
+  .Space {
+    width: 330px;
+  }
+
+  .Backspace,
+  .CapsLock,
+  .ShiftLeft {
+    width: 100px;
+  }
+
+  .Enter,
+  .ShiftRight {
+    width: 86px;
+  }
+}
+
+.key {
+  position: relative;
+
+  width: 40px;
+  height: 40px;
+  margin: 0 6px 10px 0;
+
+  font-size: 1rem;
+  text-align: center;
+  color: white;
+
+  background-color: #3a424e;
+  border-radius: 3px;
+  cursor: pointer;
+
+  transition: all 0.2s;
+
+  user-select: none;
+
+  span {
+    line-height: 40px;
+  }
+
+  sup {
+    position: absolute;
+    top: 0;
+    left: 5px;
+
+    font-size: 0.7rem;
+  }
+
+  &:hover {
+    background-color: #1c232e;
+    border: 1px solid darkslateblue;
+  }
+}
+
+.functional {
+  background-color: #1c232e;
+}
+
+.anime {
+  background-color: darkslateblue;
+  border-radius: 15px;
+
+  &:hover {
+    background-color: darkslateblue;
+  }
+}
